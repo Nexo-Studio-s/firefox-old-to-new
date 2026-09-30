@@ -1,0 +1,61 @@
+name: Nexo Browser - Windows Build
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+
+jobs:
+  build-windows:
+    name: Build Nexo Browser for Windows
+    runs-on: windows-2022
+
+    # Firefox is gigantisch en compileren kan lang duren.
+    timeout-minutes: 360
+
+    steps:
+      # ------------------------------------------------------------
+      # 1. Firefox/Nexo Browser source ophalen
+      # ------------------------------------------------------------
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ------------------------------------------------------------
+      # 2. Firefox buildomgeving voorbereiden
+      # ------------------------------------------------------------
+      - name: Bootstrap Firefox build environment
+        shell: pwsh
+        run: |
+          ./mach bootstrap --application-choice browser
+
+      # ------------------------------------------------------------
+      # 3. Firefox/Nexo Browser compileren
+      # ------------------------------------------------------------
+      - name: Build Nexo Browser
+        shell: pwsh
+        run: |
+          ./mach build
+
+      # ------------------------------------------------------------
+      # 4. Windows distributiepakket maken
+      # ------------------------------------------------------------
+      - name: Package Nexo Browser
+        shell: pwsh
+        run: |
+          ./mach package
+
+      # ------------------------------------------------------------
+      # 5. Gebouwde bestanden bewaren
+      # ------------------------------------------------------------
+      - name: Upload Nexo Browser build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nexo-Browser-Windows
+          path: |
+            obj-*/dist/*.exe
+            obj-*/dist/*.zip
+          if-no-files-found: error

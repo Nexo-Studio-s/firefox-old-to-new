@@ -2,6 +2,11 @@
 
 [Firefox](https://firefox.com/) is a fast, reliable and private web browser from the non-profit [Mozilla organization](https://mozilla.org/).
 
+# NOTICE FROM NEXO STUDIO'S
+- This Browser soon goes to Nexo Browser
+- we then will rewrite many code to our own and delete Firefox code
+- this Readme.md from Firefox along with the license and security.md will stay, so everyone notes: ''this browser is Firefox Based!!!''
+
 ### Contributing
 
 To learn how to contribute to Firefox read the [Firefox Contributors' Quick Reference document](https://firefox-source-docs.mozilla.org/contributing/contribution_quickref.html).

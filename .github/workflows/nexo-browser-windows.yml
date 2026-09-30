@@ -11,46 +11,49 @@ jobs:
   build-windows:
     name: Build Nexo Browser for Windows
     runs-on: windows-2022
-
-    # Firefox is gigantisch en compileren kan lang duren.
     timeout-minutes: 360
 
     steps:
-      # ------------------------------------------------------------
-      # 1. Firefox/Nexo Browser source ophalen
-      # ------------------------------------------------------------
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      # ------------------------------------------------------------
-      # 2. Firefox buildomgeving voorbereiden
-      # ------------------------------------------------------------
+      - name: Install MozillaBuild
+        shell: pwsh
+        run: |
+          $url = "https://ftp.mozilla.org/pub/mozilla/libraries/win32/MozillaBuildSetup-Latest.exe"
+          $installer = "$env:RUNNER_TEMP\MozillaBuildSetup.exe"
+
+          Invoke-WebRequest `
+            -Uri $url `
+            -OutFile $installer
+
+          Start-Process `
+            -FilePath $installer `
+            -ArgumentList "/S" `
+            -Wait
+
+          if (-not (Test-Path "C:\mozilla-build")) {
+            Write-Error "MozillaBuild installation failed."
+            exit 1
+          }
+
       - name: Bootstrap Firefox build environment
         shell: pwsh
         run: |
           ./mach bootstrap --application-choice browser
 
-      # ------------------------------------------------------------
-      # 3. Firefox/Nexo Browser compileren
-      # ------------------------------------------------------------
       - name: Build Nexo Browser
         shell: pwsh
         run: |
           ./mach build
 
-      # ------------------------------------------------------------
-      # 4. Windows distributiepakket maken
-      # ------------------------------------------------------------
       - name: Package Nexo Browser
         shell: pwsh
         run: |
           ./mach package
 
-      # ------------------------------------------------------------
-      # 5. Gebouwde bestanden bewaren
-      # ------------------------------------------------------------
       - name: Upload Nexo Browser build
         uses: actions/upload-artifact@v4
         with:
